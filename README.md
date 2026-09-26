@@ -12,6 +12,23 @@ Discovering Hidden Industrial Symbiosis.
 - **Dashboard Layout:** A reusable application layout with protected routes. Unauthenticated users are redirected to login.
 - **Navigation:** Overview, Industrial Map, Resources, Opportunities, Marketplace, Exchanges, Logistics, Analytics, Industrial Dashboard, Material Passport, AI Advisor, Settings.
 
+## Phase 2 Implementation
+
+- **Database Layer (MongoDB):** Centralized resource definitions (Company, Material, Waste Listing, Exchange).
+- **Core APIs:** CRUD operations via FastAPI for resources, material discovery, and industrial exchanges.
+
+## Phase 3 Implementation
+
+- **AI Integration (Gemini/OpenAI):** AI Material Analysis endpoint to parse waste descriptions into structured physical/chemical properties, handling hazards and industrial compliance automatically.
+- **Frontend Dashboard:** Connected Material Analysis UI to real-time AI suggestions for safe repurposing of industrial waste.
+
+## Phase 4 Implementation
+
+- **W2RKG (Waste-to-Resource Knowledge Graph):** Industrial ecosystem mapped as an N-hop graph structure (using NetworkX, architected for Neo4j).
+- **Path Discovery:** Capable of finding AI-suggested cross-industry supply chain connections (e.g., Steel Plant -> Slag -> Granulator -> Construction).
+- **Circular Economy Loop Detection:** Automatically finds closed loops in the material ecosystem.
+- **Visualizer:** Interactive SVG/React visualization component in the frontend to explore the knowledge graph.
+
 ## Architecture
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS
 - **Backend:** Python, FastAPI, Pydantic
