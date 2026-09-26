@@ -1,0 +1,25 @@
+# General
+node_modules/
+dist/
+build/
+.DS_Store
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.pytest_cache/
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Firebase
+firebase-service-account.json
