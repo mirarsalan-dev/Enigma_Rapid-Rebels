@@ -21,7 +21,7 @@ export const Exchanges: React.FC = () => {
     const fetchExchanges = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/exchanges/');
+        const res = await fetch('http://localhost:8000/api/exchanges/');
         if (res.ok) {
           const data = await res.json();
           setExchanges(data);

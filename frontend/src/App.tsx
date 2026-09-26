@@ -15,6 +15,12 @@ import { Exchanges } from './pages/Exchanges';
 import { IndustrialDashboard } from './pages/IndustrialDashboard';
 import { LoopHunter } from './pages/LoopHunter';
 import { IndustrialGIS } from './pages/IndustrialGIS';
+import DriverLogistics from './pages/DriverLogistics';
+import { LiveLogistics } from './pages/LiveLogistics';
+import { MaterialPassportView } from './pages/MaterialPassportView';
+import { FutureRadar } from './pages/FutureRadar';
+import { StagnationMonitor } from './pages/StagnationMonitor';
+import { Analytics } from './pages/Analytics';
 
 function App() {
   return (
@@ -38,14 +44,18 @@ function App() {
             <Route path="opportunities" element={<Opportunities />} />
             <Route path="marketplace" element={<Marketplace />} />
             <Route path="exchanges" element={<Exchanges />} />
-            <Route path="logistics" element={<div className="p-4">Logistics (Coming Soon)</div>} />
-            <Route path="analytics" element={<div className="p-4">Analytics (Coming Soon)</div>} />
+            <Route path="logistics" element={<DriverLogistics />} />
+            <Route path="live-logistics" element={<LiveLogistics />} />
+            <Route path="analytics" element={<Analytics />} />
             <Route path="industrial" element={<IndustrialDashboard />} />
-            <Route path="material-passport" element={<div className="p-4">Material Passport (Coming Soon)</div>} />
+            <Route path="material-passport" element={<MaterialPassportView />} />
+            <Route path="material-passport/:id" element={<MaterialPassportView />} />
             <Route path="ai-advisor" element={<div className="p-4">AI Advisor (Coming Soon)</div>} />
             <Route path="settings" element={<div className="p-4">Settings (Coming Soon)</div>} />
             <Route path="graph-discovery" element={<GraphDiscovery />} />
             <Route path="loop-hunter" element={<LoopHunter />} />
+            <Route path="future-radar" element={<FutureRadar />} />
+            <Route path="stagnation" element={<StagnationMonitor />} />
           </Route>
           
           <Route path="/ai/material-analysis" element={

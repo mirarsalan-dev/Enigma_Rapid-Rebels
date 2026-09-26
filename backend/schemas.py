@@ -110,6 +110,7 @@ class Opportunity(BaseModel):
     environmental_estimate: str
     opportunity_score: float
     explanation: str
+    impact_estimate: Optional['EnvironmentalImpact'] = None
 
 class OpportunityResponse(BaseModel):
     opportunities: List[Opportunity]
@@ -206,4 +207,131 @@ class Appointment(AppointmentCreate):
     appointment_id: str
     communication_history: List[CommunicationMessage] = []
 
+class DriverEvent(BaseModel):
+    event_id: str
+    device_id: str
+    timestamp: str
+    event_type: str
+    payload: Dict[str, Any]
+    sync_status: str
 
+class DriverEventSyncRequest(BaseModel):
+    events: List[DriverEvent]
+
+class Trip(BaseModel):
+    trip_id: str
+    driver_id: str
+    exchange_id: str
+    pickup_location: str
+    destination: str
+    material: str
+    status: str
+
+class CustodyStep(BaseModel):
+    step_type: str
+    entity_name: str
+    timestamp: str
+    location: str
+    notes: Optional[str] = None
+
+class PassportDataPoint(BaseModel):
+    value: str
+    source_type: str
+
+class MaterialPassport(BaseModel):
+    passport_id: str
+    material: PassportDataPoint
+    source_company: PassportDataPoint
+    batch: PassportDataPoint
+    quantity: PassportDataPoint
+    composition: PassportDataPoint
+    quality: PassportDataPoint
+    test_status: PassportDataPoint
+    origin: PassportDataPoint
+    destination: PassportDataPoint
+    processing_history: List[PassportDataPoint]
+    exchange_history: List[PassportDataPoint]
+    chain_of_custody: List[CustodyStep]
+    created_at: str
+    updated_at: str
+
+class ImpactFactor(BaseModel):
+    name: str
+    value: float
+    unit: str
+    source: str
+    assumption: str
+    calculation_method: str
+
+class EnvironmentalImpact(BaseModel):
+    waste_diverted_kg: float
+    virgin_material_avoided_kg_co2e: ImpactFactor
+    avoided_disposal_kg_co2e: ImpactFactor
+    transport_emissions_kg_co2e: ImpactFactor
+    net_benefit_kg_co2e: float
+    disclaimer: str = "Estimated environmental impact"
+
+class ForecastPeriod(BaseModel):
+    horizon: str
+    expected_surplus: float
+    expected_demand: float
+    potential_gap: float
+    confidence_score: float
+
+class ForecastResponse(BaseModel):
+    material: str
+    insufficient_data: bool
+    message: str
+    periods: List[ForecastPeriod]
+    recurring_patterns: List[str]
+    expected_shortages: List[str]
+    potential_exchanges: List[str]
+
+class StagnationAlertRequest(BaseModel):
+    exchange_id: str
+    material_name: str
+    received_quantity: float
+    used_quantity: float
+    current_holder_id: str
+
+class StagnationResolution(BaseModel):
+    pathway: str
+    resolution_type: str
+    description: str
+    target_companies: List[str]
+
+class StagnationResponse(BaseModel):
+    alert_id: str
+    status: str
+    stagnant_quantity: float
+    resolutions: List[StagnationResolution]
+
+class ChartDataPoint(BaseModel):
+    label: str
+    value: float
+
+class AnalyticsMetrics(BaseModel):
+    resource_generated: float
+    resource_exchanged: float
+    resource_diverted: float
+    active_exchanges: int
+    successful_exchanges: int
+    failed_exchanges: int
+    average_opportunity_score: float
+    potential_environmental_benefit: float
+    avg_transport_distance: float
+    material_stagnation_volume: float
+
+class AnalyticsChartData(BaseModel):
+    resource_flow: List[ChartDataPoint]
+    industry_participation: List[ChartDataPoint]
+    exchange_volume: List[ChartDataPoint]
+    material_categories: List[ChartDataPoint]
+    monthly_trends: List[ChartDataPoint]
+    opportunity_pipeline: List[ChartDataPoint]
+
+class AnalyticsResponse(BaseModel):
+    scope: str
+    has_data: bool
+    metrics: AnalyticsMetrics
+    charts: AnalyticsChartData

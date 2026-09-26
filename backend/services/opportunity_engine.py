@@ -2,6 +2,7 @@ import math
 from typing import List, Dict, Any
 from schemas import OpportunityRequest, Opportunity, UnknownUseRequest, UnknownUseOpportunity, LoopHunterRequest, LoopPath, LoopPathStep
 from services.graph_service import get_graph_provider
+from services.environmental_engine import calculate_environmental_impact
 
 # Mock potential receivers in the industrial ecosystem (W2RKG - Waste-to-Resource Knowledge Graph)
 MOCK_RECEIVERS = [
@@ -201,6 +202,16 @@ class OpportunityIntelligenceEngine:
         else:
             explanation_text = "Match scores are too low to provide specific compatibilities."
 
+        # 9. Phase 14: Environmental Impact Engine Calculation
+        category = "Default"
+        if "plastic" in mat_name.lower(): category = "Plastic"
+        elif "metal" in mat_name.lower() or "slag" in mat_name.lower(): category = "Metal"
+        elif "organic" in mat_name.lower() or "wood" in mat_name.lower(): category = "Organic"
+        elif "glass" in mat_name.lower(): category = "Glass"
+        
+        impact = calculate_environmental_impact(category, req_qty, dist_km)
+        env_estimate_str = f"{impact.net_benefit_kg_co2e:.1f} kg CO2e net benefit"
+
         return Opportunity(
             source_company=req.source_company_id or "Unknown Source",
             receiving_company=receiver["name"],
@@ -210,9 +221,10 @@ class OpportunityIntelligenceEngine:
             processing_requirement=proc_req,
             distance_km=round(dist_km, 2),
             timing_match=timing_match,
-            environmental_estimate="High Carbon Offset Potential",
+            environmental_estimate=env_estimate_str,
             opportunity_score=round(score, 2),
-            explanation=explanation_text
+            explanation=explanation_text,
+            impact_estimate=impact.dict()
         )
 
     def discover(self, req: OpportunityRequest) -> List[Opportunity]:

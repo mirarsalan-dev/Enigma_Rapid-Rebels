@@ -36,7 +36,7 @@ export const LoopHunter: React.FC = () => {
     setPaths([]);
     
     try {
-      const res = await fetch('http://localhost:8000/opportunities/loop-hunter', {
+      const res = await fetch('http://localhost:8000/api/opportunities/loop-hunter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

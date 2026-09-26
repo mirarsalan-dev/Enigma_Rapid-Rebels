@@ -25,7 +25,7 @@ export const IndustrialDashboard: React.FC = () => {
     const fetchCompanies = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/companies/');
+        const res = await fetch('http://localhost:8000/api/companies/');
         if (res.ok) {
           const data = await res.json();
           setCompanies(data);

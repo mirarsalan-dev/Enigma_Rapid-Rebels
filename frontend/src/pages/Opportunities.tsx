@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
 import { Lightbulb, Search, ArrowRight, Activity, Cpu } from 'lucide-react';
 
+interface ImpactFactor {
+  name: string;
+  value: number;
+  unit: string;
+  source: string;
+  assumption: string;
+  calculation_method: string;
+}
+
+interface EnvironmentalImpact {
+  waste_diverted_kg: number;
+  virgin_material_avoided_kg_co2e: ImpactFactor;
+  avoided_disposal_kg_co2e: ImpactFactor;
+  transport_emissions_kg_co2e: ImpactFactor;
+  net_benefit_kg_co2e: number;
+  disclaimer: string;
+}
+
 interface Opportunity {
   source_company: string;
   receiving_company: string;
@@ -13,6 +31,7 @@ interface Opportunity {
   environmental_estimate: string;
   opportunity_score: number;
   explanation: string;
+  impact_estimate?: EnvironmentalImpact;
 }
 
 interface UnknownUseOpportunity {
@@ -47,7 +66,7 @@ export const Opportunities: React.FC = () => {
     
     try {
       if (mode === 'direct') {
-        const res = await fetch('http://localhost:8000/opportunities/discover', {
+        const res = await fetch('http://localhost:8000/api/opportunities/discover', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -65,7 +84,7 @@ export const Opportunities: React.FC = () => {
           setOpportunities(data.opportunities || []);
         }
       } else {
-        const res = await fetch('http://localhost:8000/opportunities/unknown-use', {
+        const res = await fetch('http://localhost:8000/api/opportunities/unknown-use', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -185,7 +204,7 @@ export const Opportunities: React.FC = () => {
                     {opp.explanation}
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6">
                     <div>
                       <span className="block text-gray-500 mb-1">Compatibility</span>
                       <span className="text-white font-medium">{Math.round(opp.compatibility * 100)}%</span>
@@ -203,6 +222,59 @@ export const Opportunities: React.FC = () => {
                       <span className="text-white font-medium">{opp.processing_requirement || 'None'}</span>
                     </div>
                   </div>
+
+                  {opp.impact_estimate && (
+                    <div className="border border-green-900/50 bg-green-900/10 rounded-xl p-4 mt-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-bold text-green-400">🌱 {opp.impact_estimate.disclaimer}</h4>
+                        <span className="text-xl font-bold text-green-300">
+                          {opp.impact_estimate.net_benefit_kg_co2e.toFixed(1)} kg CO₂e Saved
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="bg-gray-800 p-3 rounded-lg">
+                          <p className="text-xs text-gray-400 mb-1">Material Diverted</p>
+                          <p className="text-lg font-bold text-white">{opp.impact_estimate.waste_diverted_kg.toLocaleString()} kg</p>
+                        </div>
+                        <div className="bg-gray-800 p-3 rounded-lg">
+                          <p className="text-xs text-gray-400 mb-1">Transport Impact</p>
+                          <p className="text-lg font-bold text-red-400">{opp.impact_estimate.transport_emissions_kg_co2e.value.toFixed(1)} kg CO₂e</p>
+                        </div>
+                        <div className="bg-gray-800 p-3 rounded-lg">
+                          <p className="text-xs text-gray-400 mb-1">Potential Benefit</p>
+                          <p className="text-lg font-bold text-green-400">
+                            {(opp.impact_estimate.virgin_material_avoided_kg_co2e.value + opp.impact_estimate.avoided_disposal_kg_co2e.value).toFixed(1)} kg CO₂e
+                          </p>
+                        </div>
+                      </div>
+
+                      <details className="text-xs text-gray-400 group cursor-pointer">
+                        <summary className="font-semibold text-green-500 hover:text-green-400 transition-colors list-none flex items-center">
+                          <span className="mr-2">▶</span> View Calculation Breakdown & Sources
+                        </summary>
+                        <div className="mt-3 space-y-3 pl-4 border-l border-green-900/30">
+                          {[
+                            opp.impact_estimate.virgin_material_avoided_kg_co2e, 
+                            opp.impact_estimate.avoided_disposal_kg_co2e, 
+                            opp.impact_estimate.transport_emissions_kg_co2e
+                          ].map((factor, i) => (
+                            <div key={i} className="bg-gray-800/50 p-3 rounded">
+                              <div className="flex justify-between items-start mb-1">
+                                <strong className="text-gray-200">{factor.name}</strong>
+                                <span className={factor.value < 0 || factor.name === 'Transport Emissions' ? 'text-red-400' : 'text-green-400'}>
+                                  {factor.name === 'Transport Emissions' ? '-' : '+'}{factor.value.toFixed(1)} {factor.unit}
+                                </span>
+                              </div>
+                              <p className="mb-1"><span className="text-gray-500">Method:</span> {factor.calculation_method}</p>
+                              <p className="mb-1"><span className="text-gray-500">Assumption:</span> {factor.assumption}</p>
+                              <p><span className="text-gray-500">Source:</span> <span className="italic">{factor.source}</span></p>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

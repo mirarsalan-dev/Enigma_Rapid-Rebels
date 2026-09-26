@@ -4,7 +4,7 @@ import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { 
   LayoutDashboard, Map, Database, Lightbulb, ShoppingCart, 
-  RefreshCw, Truck, BarChart3, Factory, FileText, Bot, Settings, LogOut, Crosshair
+  RefreshCw, Truck, BarChart3, Factory, FileText, Bot, Settings, LogOut, Crosshair, Radar, Activity
 } from 'lucide-react';
 
 const navItems = [
@@ -14,7 +14,8 @@ const navItems = [
   { name: 'Opportunities', path: '/dashboard/opportunities', icon: Lightbulb },
   { name: 'Marketplace', path: '/dashboard/marketplace', icon: ShoppingCart },
   { name: 'Exchanges', path: '/dashboard/exchanges', icon: RefreshCw },
-  { name: 'Logistics', path: '/dashboard/logistics', icon: Truck },
+  { name: 'Driver App (Logistics)', path: '/dashboard/logistics', icon: Truck },
+  { name: 'Live Logistics', path: '/dashboard/live-logistics', icon: Map },
   { name: 'Analytics', path: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Industrial Dashboard', path: '/dashboard/industrial', icon: Factory },
   { name: 'Material Passport', path: '/dashboard/material-passport', icon: FileText },
@@ -22,6 +23,8 @@ const navItems = [
   { name: 'W2R Knowledge Graph', path: '/dashboard/graph-discovery', icon: Database },
   { name: 'Loop Hunter', path: '/dashboard/loop-hunter', icon: Crosshair },
   { name: 'Settings', path: '/dashboard/settings', icon: Settings },
+  { name: 'Future Radar', path: '/dashboard/future-radar', icon: Radar },
+  { name: 'Stagnation Monitor', path: '/dashboard/stagnation', icon: Activity },
 ];
 
 export const DashboardLayout = () => {
