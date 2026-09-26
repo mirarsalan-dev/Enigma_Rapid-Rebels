@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Leaf, ArrowRightRight, TrendingUp } from 'lucide-react';
+import { Leaf, ArrowRightLeft, TrendingUp } from 'lucide-react';
 
 export const DashboardOverview = () => {
   const { currentUser } = useAuth();
@@ -21,7 +21,7 @@ export const DashboardOverview = () => {
         <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-gray-400 font-medium">Active Exchanges</h3>
-            <ArrowRightRight className="text-brand-primary w-5 h-5" />
+            <ArrowRightLeft className="text-brand-primary w-5 h-5" />
           </div>
           <p className="text-4xl font-bold text-white">12</p>
           <p className="text-sm text-green-400 mt-2">+3 this month</p>
