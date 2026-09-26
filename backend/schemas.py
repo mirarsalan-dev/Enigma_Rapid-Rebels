@@ -114,3 +114,96 @@ class Opportunity(BaseModel):
 class OpportunityResponse(BaseModel):
     opportunities: List[Opportunity]
     message: str = "Opportunities discovered successfully."
+
+class UnknownUseRequest(BaseModel):
+    material: MaterialDNA
+
+class UnknownUseOpportunity(BaseModel):
+    material: str
+    required_process: str
+    potential_output: str
+    potential_industries: List[str]
+    potential_downstream_users: str
+    estimated_logistics_complexity: str
+    estimated_environmental_opportunity: str
+    category: str
+    description: str
+
+class UnknownUseResponse(BaseModel):
+    opportunities: List[UnknownUseOpportunity]
+    disclaimer: str = "AI-generated opportunities are suggestions, not verified commercial opportunities."
+
+class LoopHunterRequest(BaseModel):
+    source_company_id: str
+    max_hops: int = 5
+
+class LoopPathStep(BaseModel):
+    node_id: str
+    node_type: str
+    node_name: str
+    relationship_to_next: Optional[str] = None
+
+class LoopPath(BaseModel):
+    pathway_type: str
+    number_of_hops: int
+    materials_exchanged: List[str]
+    processing_steps: List[str]
+    companies_involved: List[str]
+    transportation_requirements: str
+    timing_constraints: str
+    estimated_environmental_benefit: str
+    estimated_economic_opportunity: str
+    steps: List[LoopPathStep]
+
+class LoopHunterResponse(BaseModel):
+    paths: List[LoopPath]
+    message: str = "Loop Hunter discovery completed."
+
+class DemandCreate(BaseModel):
+    seeker_id: str
+    material_requirements: str
+    quantity: float
+    quality: str
+    location: str
+    time_window: str
+    status: str = "active"
+
+class Demand(DemandCreate):
+    demand_id: str
+
+class MarketplaceSearchRequest(BaseModel):
+    query: str
+    type: str # 'supply' or 'demand'
+    filters: Optional[Dict[str, Any]] = None
+
+class ExternalMatch(BaseModel):
+    company_name: str
+    contact_snippet: str
+    source_url: str
+    match_reason: str
+    verification_status: str = "Potentially discoverable company"
+    disclaimer: str = "This is an external search result and NOT a verified SYMBIO partner."
+
+class MarketplaceMatchResponse(BaseModel):
+    internal_matches: List[Any]
+    external_matches: List[ExternalMatch]
+
+class CommunicationMessage(BaseModel):
+    sender: str
+    message: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class AppointmentCreate(BaseModel):
+    exchange_id: str
+    source: str
+    receiver: str
+    date: str
+    time: str
+    location: str
+    status: str = "pending"
+
+class Appointment(AppointmentCreate):
+    appointment_id: str
+    communication_history: List[CommunicationMessage] = []
+
+

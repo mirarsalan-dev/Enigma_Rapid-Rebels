@@ -4,7 +4,7 @@ import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { 
   LayoutDashboard, Map, Database, Lightbulb, ShoppingCart, 
-  RefreshCw, Truck, BarChart3, Factory, FileText, Bot, Settings, LogOut 
+  RefreshCw, Truck, BarChart3, Factory, FileText, Bot, Settings, LogOut, Crosshair
 } from 'lucide-react';
 
 const navItems = [
@@ -20,6 +20,7 @@ const navItems = [
   { name: 'Material Passport', path: '/dashboard/material-passport', icon: FileText },
   { name: 'AI Advisor', path: '/dashboard/ai-advisor', icon: Bot },
   { name: 'W2R Knowledge Graph', path: '/dashboard/graph-discovery', icon: Database },
+  { name: 'Loop Hunter', path: '/dashboard/loop-hunter', icon: Crosshair },
   { name: 'Settings', path: '/dashboard/settings', icon: Settings },
 ];
 
