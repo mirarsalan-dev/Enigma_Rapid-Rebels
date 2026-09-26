@@ -19,6 +19,7 @@ const navItems = [
   { name: 'Industrial Dashboard', path: '/dashboard/industrial', icon: Factory },
   { name: 'Material Passport', path: '/dashboard/material-passport', icon: FileText },
   { name: 'AI Advisor', path: '/dashboard/ai-advisor', icon: Bot },
+  { name: 'W2R Knowledge Graph', path: '/dashboard/graph-discovery', icon: Database },
   { name: 'Settings', path: '/dashboard/settings', icon: Settings },
 ];
 

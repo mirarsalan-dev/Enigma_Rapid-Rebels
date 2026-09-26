@@ -7,6 +7,7 @@ import { AuthPage } from './pages/AuthPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { DashboardOverview } from './pages/DashboardOverview';
 import { MaterialAnalysis } from './pages/MaterialAnalysis';
+import { GraphDiscovery } from './pages/GraphDiscovery';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="material-passport" element={<div className="p-4">Material Passport (Coming Soon)</div>} />
             <Route path="ai-advisor" element={<div className="p-4">AI Advisor (Coming Soon)</div>} />
             <Route path="settings" element={<div className="p-4">Settings (Coming Soon)</div>} />
+            <Route path="graph-discovery" element={<GraphDiscovery />} />
           </Route>
           
           <Route path="/ai/material-analysis" element={
