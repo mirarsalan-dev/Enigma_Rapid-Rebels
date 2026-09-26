@@ -89,3 +89,28 @@ class MaterialDNA(BaseModel):
 class MaterialDNAResponse(BaseModel):
     dna: MaterialDNA
     disclaimer: str = "AI analysis is an intelligent classification/compatibility aid. Physical verification requires specifications, test reports, sampling or receiver validation."
+
+class OpportunityRequest(BaseModel):
+    source_company_id: Optional[str] = None
+    material: MaterialDNA
+    quantity_available: float
+    availability_window: Optional[str] = None
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+
+class Opportunity(BaseModel):
+    source_company: str
+    receiving_company: str
+    material: str
+    quantity: float
+    compatibility: float
+    processing_requirement: Optional[str] = None
+    distance_km: float
+    timing_match: bool
+    environmental_estimate: str
+    opportunity_score: float
+    explanation: str
+
+class OpportunityResponse(BaseModel):
+    opportunities: List[Opportunity]
+    message: str = "Opportunities discovered successfully."
