@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'leaflet/dist/leaflet.css';
+
+@layer base {
+  body {
+    @apply bg-brand-dark text-brand-light antialiased;
+  }
+}
+
+/* Ensure Leaflet container always fills available space and tiles render crisply */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background: #0f172a !important;
+  font-family: inherit !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
+

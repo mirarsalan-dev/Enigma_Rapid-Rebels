@@ -1,0 +1,6 @@
+{
+  "name": "SYMBIO - Industrial Resource Intelligence Network",
+  "description": "AI-powered industrial symbiosis and waste-to-resource exchange platform connecting facilities to exchange secondary materials, map closed loops, and optimize circular supply chains.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
