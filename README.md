@@ -5,40 +5,58 @@
 ## Problem Statement
 Discovering Hidden Industrial Symbiosis.
 
-## Hackathon Constraints Adherence
-- **AI Acknowledgment:** This project utilizes AI-generated code (acknowledged as per hackathon rules) for foundational setup and development acceleration.
-- **Open-source:** All libraries and frameworks used are open-source.
-- **Fresh Development:** All code was developed during the hackathon period.
+## Phase 1 Implementation
+
+- **Landing Page:** Explains industrial waste/resource exchange, hidden industrial symbiosis, AI-powered resource discovery, and circular economy. Includes "Enter SYMBIO" CTA.
+- **Authentication:** Firebase Email/Password Authentication. Backend uses Firebase Admin SDK to verify ID tokens.
+- **Dashboard Layout:** A reusable application layout with protected routes. Unauthenticated users are redirected to login.
+- **Navigation:** Overview, Industrial Map, Resources, Opportunities, Marketplace, Exchanges, Logistics, Analytics, Industrial Dashboard, Material Passport, AI Advisor, Settings.
 
 ## Architecture
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS
 - **Backend:** Python, FastAPI, Pydantic
-- **Database:** MongoDB Atlas
 - **Authentication:** Firebase Authentication, Firebase Admin SDK
-- **AI:** Open-source AI model integration
-- **GIS:** Leaflet, OpenStreetMap, OSRM
-- **Knowledge Graph:** W2RKG, NetworkX (extensible to Neo4j)
-
-## Project Structure
-- `/frontend`: React + Vite frontend application
-- `/backend`: FastAPI Python backend application
+- **Design:** Open-source UI assets (Lucide React)
 
 ## Setup Instructions
 
 ### Prerequisites
 - Node.js (v18+)
 - Python (v3.9+)
-- Docker & Docker Compose (optional for local deployment)
+- Firebase Project (for Authentication)
+
+### Authentication Setup
+1. Go to the [Firebase Console](https://console.firebase.google.com/).
+2. Create a new project or select an existing one.
+3. Navigate to **Authentication** > **Sign-in method** and enable **Email/Password**.
+4. Navigate to **Project settings** > **General** and add a web app to get your Firebase configuration keys.
+5. Navigate to **Project settings** > **Service accounts** and generate a new private key. Save this file as `firebase-service-account.json` in the `backend` directory.
 
 ### Environment Variables
-Copy `.env.example` to `.env` and fill in the necessary configuration details. Do not use production credentials.
-```bash
-cp .env.example .env
+
+**Frontend (`frontend/.env`):**
+Create a `.env` file in the `frontend` directory by copying `.env.example`:
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-### Running Locally (Without Docker)
+**Backend (`.env` in root or backend):**
+Configure your MongoDB and Firebase Admin credentials as seen in `.env.example`.
+For MongoDB Atlas, you must provide your cluster connection string in `MONGODB_URI`.
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
+MONGODB_DB_NAME=symbio_db
+GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
+```
 
-**Backend:**
+### Running Locally
+
+**How to run Backend:**
 ```bash
 cd backend
 python -m venv venv
@@ -47,15 +65,18 @@ python -m venv venv
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
+*Note: Ensure `firebase-service-account.json` is present in the backend directory for token verification to work.*
 
-**Frontend:**
+**How to run Frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Running with Docker
+### Docker
+To run using Docker Compose:
 ```bash
 docker-compose up --build
 ```
+
