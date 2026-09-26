@@ -29,6 +29,16 @@ Discovering Hidden Industrial Symbiosis.
 - **Circular Economy Loop Detection:** Automatically finds closed loops in the material ecosystem.
 - **Visualizer:** Interactive SVG/React visualization component in the frontend to explore the knowledge graph.
 
+## Phases 5 to 17 Implementation Highlights
+
+- **Opportunity Engine & Geographic Search (Phases 5-7):** Matchmaking engine scoring exchanges by volume and chemical match. Industrial Geographic System (GIS) utilizing OSRM and Leaflet for geospatial routing and distance optimization.
+- **Marketplace & Communications (Phases 8-10):** Real-time bidding system, automated contract generation, and integrated Twilio SMS notifications for supply chain partners.
+- **SYMBIO Driver Logistics (Phases 11-12):** Offline-first driver application using SQLite and syncing queues. Live Logistics Tracking leveraging Firebase Realtime Database for active GPS stream buffering.
+- **Digital Material Passport (Phase 13):** Cryptographically robust tracking (simulated) of chain of custody (Source → Pickup → Processor → Receiver).
+- **Environmental Impact Engine (Phase 14):** Transparent CO₂e and Virgin Material avoidance calculator grounded in verified EPA WARM factors, completely avoiding AI hallucinations.
+- **Future Radar & Stagnation Intelligence (Phases 15-16):** 4-horizon time-series forecasting for surplus and demand. Dynamic alerts for unused exchanged materials (stagnation) with automated downstream pathway resolution (No Viable Pathway, Transformation Required, Immediate Match).
+- **SYMBIO Analytics (Phase 17):** Dedicated dynamic dashboard aggregating live metrics across Company, Ecosystem, and Platform scopes with custom charts tracking Resource Flow, Exchange Volume, and Material Categories.
+
 ## Architecture
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS
 - **Backend:** Python, FastAPI, Pydantic
