@@ -64,3 +64,28 @@ class Exchange(ExchangeCreate):
     exchange_id: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class MaterialAnalysisRequest(BaseModel):
+    description: str
+
+class MaterialDNA(BaseModel):
+    material_name: str
+    source_industry: Optional[str] = None
+    composition: Optional[Dict[str, Any]] = None
+    physical_properties: Optional[Dict[str, Any]] = None
+    chemical_properties: Optional[Dict[str, Any]] = None
+    quantity: Optional[float] = None
+    unit: Optional[str] = None
+    quality_grade: Optional[str] = None
+    moisture: Optional[str] = None
+    contamination_information: Optional[str] = None
+    availability_window: Optional[str] = None
+    location: Optional[str] = None
+    processing_requirements: Optional[str] = None
+    possible_applications: List[str] = []
+    verification_status: str = "UNVERIFIED" # VERIFIED, PARTIALLY_VERIFIED, UNVERIFIED, NEEDS_TESTING
+    evidence_source: Optional[str] = None
+
+class MaterialDNAResponse(BaseModel):
+    dna: MaterialDNA
+    disclaimer: str = "AI analysis is an intelligent classification/compatibility aid. Physical verification requires specifications, test reports, sampling or receiver validation."

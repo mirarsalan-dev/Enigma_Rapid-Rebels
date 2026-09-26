@@ -6,7 +6,7 @@ from auth import verify_token
 from contextlib import asynccontextmanager
 
 from database import init_db_indexes
-from routers import companies, materials, waste_listings, exchanges
+from routers import companies, materials, waste_listings, exchanges, ai
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +35,7 @@ app.include_router(companies.router, prefix="/api")
 app.include_router(materials.router, prefix="/api")
 app.include_router(waste_listings.router, prefix="/api")
 app.include_router(exchanges.router, prefix="/api")
+app.include_router(ai.router, prefix="/api")
 
 class HealthResponse(BaseModel):
     status: str

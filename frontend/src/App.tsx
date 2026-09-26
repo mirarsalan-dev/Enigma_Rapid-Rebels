@@ -6,6 +6,7 @@ import { LandingPage } from './pages/LandingPage';
 import { AuthPage } from './pages/AuthPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { DashboardOverview } from './pages/DashboardOverview';
+import { MaterialAnalysis } from './pages/MaterialAnalysis';
 
 function App() {
   return (
@@ -36,6 +37,12 @@ function App() {
             <Route path="ai-advisor" element={<div className="p-4">AI Advisor (Coming Soon)</div>} />
             <Route path="settings" element={<div className="p-4">Settings (Coming Soon)</div>} />
           </Route>
+          
+          <Route path="/ai/material-analysis" element={
+            <ProtectedRoute>
+              <MaterialAnalysis />
+            </ProtectedRoute>
+          } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
