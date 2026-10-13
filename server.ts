@@ -2,15 +2,25 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import twilio from 'twilio';
 import { GoogleGenAI } from '@google/genai';
+
+// Load .env if present
+try {
+  if (fs.existsSync('.env') && typeof (process as any).loadEnvFile === 'function') {
+    (process as any).loadEnvFile('.env');
+  }
+} catch (e) {
+  console.warn('Note: .env file load skipped:', e);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const HOST = '0.0.0.0';
 
 app.use(cors());
@@ -1499,21 +1509,52 @@ app.post('/api/opportunities/unknown-use', (req: Request, res: Response) => {
   });
 });
 
-app.post('/api/opportunities/loop-hunter', (_req: Request, res: Response) => {
+app.post('/api/opportunities/loop-hunter', (req: Request, res: Response) => {
+  const sourceCompany = req.body?.source_company_id || 'Apex Steel Plant';
+
   res.json({
     paths: [
       {
         path_id: 'loop_path_alpha',
+        pathway_type: 'CLOSED LOOP',
+        number_of_hops: 3,
+        materials_exchanged: [
+          'Raw Air-Cooled Slag',
+          'Granulated Slag (GBFS)',
+          'Reinforcing Rebar Scrap',
+        ],
+        processing_steps: [
+          'Crushing & Water Granulation (GBFS)',
+          'Batch Plant Blending for Structural Slabs',
+          'Electric Arc Furnace Re-melting',
+        ],
+        companies_involved: [
+          sourceCompany,
+          'Green Aggregate Processors',
+          'BuildRight Construction',
+        ],
+        transportation_requirements: '40t Heavy Pneumatic Bulk Hauler (Max 45 min transit)',
+        timing_constraints: 'Continuous 24/7 kiln feed; 48hr delivery SLA',
+        estimated_environmental_benefit: '24.5 MT CO2e Abated (Zero Landfill)',
+        estimated_economic_opportunity: '$18,400 / month cost savings',
         steps: [
           {
+            node_id: 'node_1',
+            node_type: 'Company',
+            node_name: sourceCompany,
+            relationship_to_next: 'Discharges Slag',
             step_number: 1,
-            from_entity: 'Apex Steel Plant',
+            from_entity: sourceCompany,
             to_entity: 'Green Aggregate Processors',
             material: 'Raw Air-Cooled Slag',
             process_applied: 'Crushing & Water Granulation (GBFS)',
             distance_km: 12.1,
           },
           {
+            node_id: 'node_2',
+            node_type: 'Process',
+            node_name: 'Granulation Hub',
+            relationship_to_next: 'Supplies GBFS',
             step_number: 2,
             from_entity: 'Green Aggregate Processors',
             to_entity: 'BuildRight Construction',
@@ -1522,18 +1563,86 @@ app.post('/api/opportunities/loop-hunter', (_req: Request, res: Response) => {
             distance_km: 8.5,
           },
           {
+            node_id: 'node_3',
+            node_type: 'Company',
+            node_name: 'BuildRight Construction',
+            relationship_to_next: 'Returns Rebar Scrap',
             step_number: 3,
             from_entity: 'BuildRight Construction',
-            to_entity: 'Apex Steel Plant',
+            to_entity: sourceCompany,
             material: 'Demolition Reinforcing Rebar Scrap',
             process_applied: 'Electric Arc Furnace Re-melting',
             distance_km: 14.3,
+          },
+          {
+            node_id: 'node_4',
+            node_type: 'Company',
+            node_name: sourceCompany,
+            relationship_to_next: null,
           },
         ],
         total_distance_km: 34.9,
         circularity_score: 96,
         total_co2_reduction_kg: 24500,
         description: 'Closed-loop 3-node industrial ecosystem retaining 100% of mineral and metallic values locally.',
+      },
+      {
+        path_id: 'loop_path_beta',
+        pathway_type: 'MULTI-HOP EXCHANGE',
+        number_of_hops: 2,
+        materials_exchanged: [
+          'Spent Silica Foundry Sand',
+          'Pavement Sub-Base Binder',
+        ],
+        processing_steps: [
+          'Magnetic Fractionation & Thermal Drying',
+          'Asphalt Batching Hot Mix',
+        ],
+        companies_involved: [
+          'Pacific Casting & Metal Foundry',
+          'Green Resource Pozzolan Granulator',
+          'CalTrans Paving Batch #4',
+        ],
+        transportation_requirements: 'Tri-axle Dump Trailer (22 km haul)',
+        timing_constraints: 'Weekly scheduled batch pickup',
+        estimated_environmental_benefit: '16.8 MT CO2e Abated',
+        estimated_economic_opportunity: '$12,200 / month savings',
+        steps: [
+          {
+            node_id: 'node_f1',
+            node_type: 'Company',
+            node_name: 'Pacific Casting & Metal Foundry',
+            relationship_to_next: 'Discharges Foundry Sand',
+            step_number: 1,
+            from_entity: 'Pacific Casting & Metal Foundry',
+            to_entity: 'Green Resource Granulator',
+            material: 'Spent Silica Foundry Sand',
+            process_applied: 'Magnetic Fractionation & Thermal Drying',
+            distance_km: 11.2,
+          },
+          {
+            node_id: 'node_f2',
+            node_type: 'Process',
+            node_name: 'Granulator & Dryer',
+            relationship_to_next: 'Supplied To',
+            step_number: 2,
+            from_entity: 'Green Resource Granulator',
+            to_entity: 'CalTrans Paving Batch #4',
+            material: 'Refined Pozzolan Sand',
+            process_applied: 'Asphalt Batching Hot Mix',
+            distance_km: 15.2,
+          },
+          {
+            node_id: 'node_f3',
+            node_type: 'Company',
+            node_name: 'CalTrans Paving Batch #4',
+            relationship_to_next: null,
+          },
+        ],
+        total_distance_km: 26.4,
+        circularity_score: 91,
+        total_co2_reduction_kg: 16800,
+        description: 'Multi-hop valorization of foundry sand into high-durability highway sub-base.',
       },
     ],
     message: 'Loop Hunter discovery completed successfully.',
@@ -1858,9 +1967,30 @@ const twilioLogs: TwilioLogItem[] = [
 
 const twilioOtps = new Map<string, { otp: string; expiresAt: number; verified: boolean; consignment_id?: string }>();
 
+function getTwilioCredentials() {
+  const envSid = process.env.TWILIO_ACCOUNT_SID;
+  const accountSid = (envSid && envSid.startsWith('AC') && envSid.length >= 30 && !envSid.includes('your_'))
+    ? envSid
+    : '';
+
+  const envAuth = process.env.TWILIO_AUTH_TOKEN;
+  const authToken = (envAuth && envAuth.length >= 20 && !envAuth.includes('your_') && !envAuth.includes('mock'))
+    ? envAuth
+    : '';
+
+  const envPhone = process.env.TWILIO_PHONE_NUMBER;
+  const phoneNumber = (envPhone && envPhone.startsWith('+') && !envPhone.includes('your_'))
+    ? envPhone
+    : '';
+
+  const defaultTo = process.env.TWILIO_DEFAULT_TO || '';
+  const defaultCallUrl = process.env.TWILIO_CALL_URL || 'https://webhooks.twilio.com/v1/Voice/Template/voice_speech_recognition';
+
+  return { accountSid, authToken, phoneNumber, defaultTo, defaultCallUrl };
+}
+
 function getTwilioClient() {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const { accountSid, authToken } = getTwilioCredentials();
   if (
     accountSid &&
     authToken &&
@@ -1880,21 +2010,22 @@ function getTwilioClient() {
 }
 
 app.get('/api/twilio/config', (_req: Request, res: Response) => {
-  const hasAccountSid = Boolean(process.env.TWILIO_ACCOUNT_SID);
-  const hasAuthToken = Boolean(process.env.TWILIO_AUTH_TOKEN);
-  const phoneNumber = process.env.TWILIO_PHONE_NUMBER || '+1 (555) 796-2461 (Sandbox Mode)';
+  const { accountSid, authToken, phoneNumber, defaultTo, defaultCallUrl } = getTwilioCredentials();
   const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+1 (415) 523-8886 (Twilio Sandbox)';
   const hasVerifyService = Boolean(process.env.TWILIO_VERIFY_SERVICE_SID);
-  const isLive = Boolean(hasAccountSid && hasAuthToken && getTwilioClient());
+  const client = getTwilioClient();
+  const isLive = Boolean(accountSid && authToken && client);
 
   res.json({
-    configured: hasAccountSid && hasAuthToken,
+    configured: Boolean(accountSid && authToken),
     isLive,
-    accountSidMasked: process.env.TWILIO_ACCOUNT_SID ? `${process.env.TWILIO_ACCOUNT_SID.substring(0, 6)}...` : 'Not Set (Sandbox Active)',
+    accountSidMasked: accountSid ? `${accountSid.substring(0, 8)}...${accountSid.substring(accountSid.length - 4)}` : 'Not Set',
     phoneNumber,
+    defaultTo,
+    defaultCallUrl,
     whatsappNumber,
     hasVerifyService,
-    activeChannels: ['SMS Dispatch', 'WhatsApp Manifests', 'Voice IVR Alerts', 'Verify 2FA Gatepass', 'Interactive Webhooks']
+    activeChannels: ['Voice Speech Recognition Calls', 'Emergency IVR Alerts', 'SMS Driver Dispatch', 'WhatsApp Manifests', 'Verify 2FA Gatepass']
   });
 });
 
@@ -2005,28 +2136,53 @@ app.post('/api/twilio/send-whatsapp', async (req: Request, res: Response) => {
 });
 
 app.post('/api/twilio/trigger-call', async (req: Request, res: Response) => {
-  const { to, alert_type, location, facility_name } = req.body;
-  const recipient = to || '+1 (555) 440-9281';
+  const { to, from, alert_type, location, facility_name, url, twiml } = req.body;
+  const creds = getTwilioCredentials();
+  const recipient = to || creds.defaultTo;
+  const fromNumber = from || creds.phoneNumber;
   const alertType = alert_type || 'Hazardous Byproduct Transport Anomaly';
   const facility = facility_name || 'Apex Metallurgy Industrial Cluster';
+  const callUrl = url || creds.defaultCallUrl;
   
   const spokenText = `This is an automated safety alert from the SYMBIO Industrial Symbiosis Monitoring System. Alert: ${alertType} detected at ${facility}. Please check the SYMBIO live incident console immediately to verify containment and chain of custody.`;
 
   const client = getTwilioClient();
   let sid = 'CA' + Math.random().toString(36).substring(2, 12).toUpperCase();
-  let status: 'COMPLETED' | 'QUEUED' = 'COMPLETED';
+  let status: string = 'QUEUED';
+  let liveCallResult: any = null;
+  let callError: string | null = null;
 
-  if (client && process.env.TWILIO_PHONE_NUMBER) {
+  if (client) {
     try {
-      const result = await client.calls.create({
+      const callOptions: any = {
         to: recipient,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        twiml: `<Response><Say voice="Polly.Matthew" language="en-US">${spokenText}</Say></Response>`
-      });
+        from: fromNumber,
+      };
+
+      if (twiml) {
+        callOptions.twiml = twiml;
+      } else if (callUrl) {
+        callOptions.url = callUrl;
+      } else {
+        callOptions.twiml = `<Response><Say voice="Polly.Matthew" language="en-US">${spokenText}</Say></Response>`;
+      }
+
+      console.log(`Initiating Twilio Voice Call to ${recipient} from ${fromNumber}...`);
+      const result = await client.calls.create(callOptions);
       sid = result.sid;
-      status = (result.status as any).toUpperCase() || 'QUEUED';
+      status = (result.status as any)?.toUpperCase() || 'QUEUED';
+      liveCallResult = {
+        sid: result.sid,
+        status: result.status,
+        to: result.to,
+        from: result.from,
+        dateCreated: result.dateCreated,
+      };
+      console.log(`Twilio Voice Call initiated successfully! SID: ${sid}, Status: ${status}`);
     } catch (err: any) {
       console.error('Twilio Voice Call Error:', err.message);
+      callError = err.message;
+      status = 'FAILED';
     }
   }
 
@@ -2036,13 +2192,28 @@ app.post('/api/twilio/trigger-call', async (req: Request, res: Response) => {
     channel: 'VOICE',
     direction: 'OUTBOUND',
     to: recipient,
-    from: process.env.TWILIO_PHONE_NUMBER || '+1 (555) 796-2461',
-    body: `[Automated Voice Call]: ${spokenText}`,
-    status,
+    from: fromNumber,
+    body: callError 
+      ? `[Voice Call Failed]: ${callError}` 
+      : callUrl 
+        ? `[Twilio Voice Template (${callUrl})] Call initiated to ${recipient}` 
+        : `[Automated Voice Call]: ${spokenText}`,
+    status: status as any,
     created_at: new Date().toISOString(),
-    metadata: { alertType, facility, simulation: !client }
+    metadata: { alertType, facility, url: callUrl, callError, live: Boolean(client && !callError) }
   };
   twilioLogs.unshift(logItem);
+
+  if (callError) {
+    return res.status(400).json({
+      success: false,
+      error: callError,
+      sid,
+      recipient,
+      from: fromNumber,
+      log: logItem
+    });
+  }
 
   res.json({
     success: true,
@@ -2050,8 +2221,11 @@ app.post('/api/twilio/trigger-call', async (req: Request, res: Response) => {
     channel: 'VOICE',
     status,
     recipient,
+    from: fromNumber,
+    url: callUrl,
     spokenText,
-    message: 'Automated Twilio Voice alert call initiated.',
+    message: `Automated Twilio Voice alert call successfully initiated to ${recipient}.`,
+    apiResponse: liveCallResult,
     log: logItem
   });
 });
@@ -2256,16 +2430,28 @@ app.post('/api/twilio/webhook', (req: Request, res: Response) => {
 let geminiAiInstance: GoogleGenAI | null = null;
 function getGeminiAi(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
+  if (
+    !apiKey ||
+    apiKey === 'YOUR_GEMINI_API_KEY' ||
+    apiKey.startsWith('MOCK') ||
+    apiKey.startsWith('AIzaSy_MOCK') ||
+    apiKey.length < 20
+  ) {
+    return null;
+  }
   if (!geminiAiInstance) {
-    geminiAiInstance = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
+    try {
+      geminiAiInstance = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
         },
-      },
-    });
+      });
+    } catch {
+      return null;
+    }
   }
   return geminiAiInstance;
 }
@@ -2301,7 +2487,7 @@ app.post('/api/gemini/chat', async (req: Request, res: Response) => {
       }));
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-2.5-flash',
         contents,
         config: {
           systemInstruction: effectiveSystemInstruction,
@@ -2313,12 +2499,12 @@ app.post('/api/gemini/chat', async (req: Request, res: Response) => {
       
       return res.json({
         reply: replyText,
-        model: 'gemini-3.8-flash',
+        model: 'gemini-2.5-flash',
         isLiveAI: true,
         timestamp: new Date().toISOString()
       });
-    } catch (err: any) {
-      console.warn('Gemini API call encountered an issue, falling back to SYMBIO expert heuristic engine:', err.message);
+    } catch {
+      // Handled cleanly by expert fallback engine
     }
   }
 
@@ -2453,9 +2639,9 @@ let platformSettings: SymbioSettings = {
     coordinates: { lat: 34.08, lng: -118.22 },
   },
   twilio: {
-    default_sms_to: '+1 (555) 349-2810',
-    default_whatsapp_to: '+1 (555) 842-1923',
-    safety_escalation_phone: '+1 (555) 440-9281',
+    default_sms_to: '+919869108305',
+    default_whatsapp_to: '+919869108305',
+    safety_escalation_phone: '+919869108305',
     enable_otp_weighbridge: true,
     otp_expiration_minutes: 10,
     auto_notify_on_dispatch: true,
@@ -2524,7 +2710,7 @@ async function startServer() {
   } else {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req: Request, res: Response) => {
+    app.use((_req: Request, res: Response) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useAuth } from '../contexts/AuthContext';
-import { Factory } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -34,44 +34,58 @@ export const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-brand-dark font-sans text-brand-light p-4">
-      <Link to="/" className="absolute top-8 left-8 text-xl font-bold bg-gradient-to-r from-brand-primary to-brand-accent bg-clip-text text-transparent flex items-center">
-        <Factory className="mr-2 text-brand-primary" /> SYMBIO
+    <div className="min-h-screen flex flex-col justify-center items-center bg-[#F8FAFC] dark:bg-[#090D14] font-sans text-black dark:text-white p-4 relative">
+      {/* Brand Header Link */}
+      <Link to="/" className="absolute top-6 left-6 flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
+          S
+        </div>
+        <span className="text-base font-bold text-black dark:text-white tracking-tight">
+          SYMBIO Intelligence
+        </span>
       </Link>
 
-      <div className="w-full max-w-md bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-2xl">
-        <h2 className="text-3xl font-bold mb-2 text-center">
-          {isLogin ? 'Welcome Back' : 'Create Account'}
-        </h2>
-        <p className="text-gray-400 text-center mb-8">
-          {isLogin ? 'Enter your credentials to access SYMBIO' : 'Join the Industrial Resource Intelligence Network'}
-        </p>
+      <div className="w-full max-w-sm bg-white dark:bg-[#131926] p-6 sm:p-8 rounded-xl border border-[#E2E8F0] dark:border-[#222C3F] shadow-sm space-y-5">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold text-black dark:text-white tracking-tight">
+            {isLogin ? 'Sign In to Portal' : 'Register Facility Account'}
+          </h2>
+          <p className="text-xs text-[#64748B] dark:text-[#94A3B8]">
+            {isLogin 
+              ? 'Enter facility credentials to access ESG telematics & ledger' 
+              : 'Join the verified Industrial Symbiosis & Material Network'}
+          </p>
+        </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-lg text-sm mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 p-2.5 rounded-md text-xs">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+            <label className="block text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] mb-1 uppercase tracking-wider">
+              Facility Work Email
+            </label>
             <input 
               type="email" 
               required
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-white transition-colors"
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-[#090D14] border border-[#E2E8F0] dark:border-[#222C3F] rounded-md focus:outline-none focus:border-[#2563EB] text-xs text-black dark:text-white placeholder-[#94A3B8] transition-colors"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder="esg@apex-metallurgy.com"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+            <label className="block text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] mb-1 uppercase tracking-wider">
+              Security Key / Password
+            </label>
             <input 
               type="password" 
               required
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-white transition-colors"
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-[#090D14] border border-[#E2E8F0] dark:border-[#222C3F] rounded-md focus:outline-none focus:border-[#2563EB] text-xs text-black dark:text-white placeholder-[#94A3B8] transition-colors"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -81,31 +95,39 @@ export const AuthPage = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full py-3 bg-brand-primary hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors mt-6 disabled:opacity-50"
+            className="w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-md font-semibold text-xs transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-1.5"
           >
-            {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
-          </button>
-
-          <button 
-            type="button" 
-            onClick={() => {
-              loginAsDemo();
-              navigate('/dashboard');
-            }}
-            className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-brand-primary border border-gray-700 rounded-lg font-semibold transition-colors mt-3"
-          >
-            Explore Demo Environment
+            <span>{loading ? 'Verifying...' : isLogin ? 'Sign In' : 'Create Account'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-400">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <div className="relative py-1 flex items-center justify-center">
+          <div className="border-t border-[#E2E8F0] dark:border-[#222C3F] w-full"></div>
+          <span className="bg-white dark:bg-[#131926] px-2 text-[10px] uppercase font-semibold text-[#94A3B8] absolute">
+            or instant sandbox
+          </span>
+        </div>
+
+        {/* Demo Fast Access Button */}
+        <button
+          onClick={() => {
+            loginAsDemo();
+            navigate('/dashboard');
+          }}
+          className="w-full py-2 bg-slate-50 dark:bg-[#182030] hover:bg-slate-100 dark:hover:bg-[#222C3F] text-black dark:text-white border border-[#E2E8F0] dark:border-[#222C3F] rounded-md text-xs font-semibold transition-colors flex items-center justify-center gap-2"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
+          <span>Launch Demo Sandbox</span>
+        </button>
+
+        <div className="text-center pt-1">
           <button 
-            type="button" 
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-brand-primary hover:underline font-medium"
+            type="button"
+            onClick={() => setIsLogin(!isLogin)} 
+            className="text-xs text-[#2563EB] dark:text-[#60A5FA] hover:underline font-medium"
           >
-            {isLogin ? 'Sign Up' : 'Log In'}
+            {isLogin ? "Need a facility account? Register here" : "Already registered? Sign in"}
           </button>
         </div>
       </div>

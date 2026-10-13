@@ -233,8 +233,8 @@ export const IndustrialGIS: React.FC = () => {
       case 'voyager':
       default:
         return {
-          url: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CARTO'
+          url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         };
     }
   };

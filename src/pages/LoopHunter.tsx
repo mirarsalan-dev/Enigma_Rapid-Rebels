@@ -1,24 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, Zap, RefreshCw, GitMerge, ArrowRight, Server, Search } from 'lucide-react';
+import { 
+  Activity, Zap, RefreshCw, GitMerge, ArrowRight, Server, Search, 
+  ShieldCheck, CheckCircle2, ChevronRight, Layers, Compass
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface LoopPathStep {
-  node_id: string;
-  node_type: string;
-  node_name: string;
-  relationship_to_next: string | null;
+  node_id?: string;
+  node_type?: string;
+  node_name?: string;
+  relationship_to_next?: string | null;
+  step_number?: number;
+  from_entity?: string;
+  to_entity?: string;
+  material?: string;
+  process_applied?: string;
+  distance_km?: number;
 }
 
 interface LoopPath {
-  pathway_type: string;
-  number_of_hops: number;
-  materials_exchanged: string[];
-  processing_steps: string[];
-  companies_involved: string[];
-  transportation_requirements: string;
-  timing_constraints: string;
-  estimated_environmental_benefit: string;
-  estimated_economic_opportunity: string;
-  steps: LoopPathStep[];
+  pathway_type?: string;
+  number_of_hops?: number;
+  materials_exchanged?: string[];
+  processing_steps?: string[];
+  companies_involved?: string[];
+  transportation_requirements?: string;
+  timing_constraints?: string;
+  estimated_environmental_benefit?: string;
+  estimated_economic_opportunity?: string;
+  total_distance_km?: number;
+  total_co2_reduction_kg?: number;
+  circularity_score?: number;
+  description?: string;
+  steps?: LoopPathStep[];
 }
 
 export const LoopHunter: React.FC = () => {
@@ -28,26 +42,28 @@ export const LoopHunter: React.FC = () => {
   const [sourceCompany, setSourceCompany] = useState('Apex Steel Plant');
   const [message, setMessage] = useState<string | null>(null);
 
-  const discoverLoops = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    executeDiscovery('Apex Steel Plant');
+  }, []);
+
+  const executeDiscovery = async (companyName: string) => {
     setLoading(true);
     setSearched(true);
     setMessage(null);
-    setPaths([]);
     
     try {
       const res = await fetch('/api/opportunities/loop-hunter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          source_company_id: sourceCompany,
+          source_company_id: companyName || 'Apex Steel Plant',
           max_hops: 5
         })
       });
       
       if (res.ok) {
         const data = await res.json();
-        setPaths(data.paths || []);
+        setPaths(Array.isArray(data.paths) ? data.paths : []);
         if (data.message) {
           setMessage(data.message);
         }
@@ -59,139 +75,188 @@ export const LoopHunter: React.FC = () => {
     }
   };
 
-  const getPathwayColor = (type: string) => {
-    switch(type) {
-      case 'CLOSED LOOP': return 'border-brand-accent text-brand-accent bg-brand-accent/10';
-      case 'MULTI-HOP EXCHANGE': return 'border-blue-500 text-blue-500 bg-blue-500/10';
-      case 'TRANSFORMATION REQUIRED': return 'border-orange-500 text-orange-500 bg-orange-500/10';
-      case 'DIRECT EXCHANGE': return 'border-green-500 text-green-500 bg-green-500/10';
-      default: return 'border-gray-500 text-gray-500 bg-gray-500/10';
-    }
+  const discoverLoops = async (e: React.FormEvent) => {
+    e.preventDefault();
+    executeDiscovery(sourceCompany);
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto text-brand-light">
-      <div className="flex items-center space-x-3 mb-8">
-        <RefreshCw className="w-8 h-8 text-brand-accent animate-[spin_10s_linear_infinite]" />
-        <h1 className="text-2xl font-bold text-white">LOOP HUNTER</h1>
+    <div className="space-y-6">
+      {/* Header Banner */}
+      <div className="bg-white dark:bg-[#101F32] border border-[#E2E8F0] dark:border-[#1E2E44] p-6 rounded-card flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-subtle">
+        <div>
+          <div className="flex items-center gap-2 mb-1 text-xs">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0FDFB] text-[#175B57] dark:bg-[#175B57]/30 dark:text-[#5EEADF] uppercase tracking-wider flex items-center gap-1">
+              <RefreshCw className="w-3 h-3 text-[#2FA7A0]" />
+              Circular Graph Traversal
+            </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F2FDF6] text-[#236140] dark:bg-[#236140]/30 dark:text-[#86EFAC] uppercase tracking-wider">
+              Zero Landfill Verified
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold text-[#0B1F5B] dark:text-white tracking-tight">Multi-Hop Closed Loop Discovery</h1>
+          <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1 max-w-2xl">
+            Traverse the Waste-to-Resource Knowledge Graph to compute cyclic industrial cascades, returning secondary residuals back to origin manufacturers.
+          </p>
+        </div>
+
+        <Link
+          to="/dashboard/graph-discovery"
+          className="px-3.5 py-2 bg-white dark:bg-[#0D1B2A] hover:bg-[#F8FAFC] dark:hover:bg-[#1E2E44] text-[#172554] dark:text-white border border-[#E2E8F0] dark:border-[#1E2E44] rounded-btn text-xs font-semibold transition-colors flex items-center gap-1.5 self-start md:self-center"
+        >
+          <Layers className="w-3.5 h-3.5 text-[#2FA7A0]" />
+          <span>Knowledge Graph</span>
+        </Link>
       </div>
 
-      <div className="bg-gray-900 border border-brand-accent/30 p-6 rounded-2xl mb-8 shadow-[0_0_15px_rgba(139,92,246,0.1)]">
-        <h2 className="text-lg font-medium text-white mb-4">Multi-Hop Symbiosis Discovery</h2>
-        <p className="text-gray-400 text-sm mb-6">
-          Uncover complex, multi-stage industrial symbiosis networks. Loop Hunter analyzes the Waste-to-Resource Knowledge Graph to discover circular pathways beyond simple direct exchanges.
-        </p>
-        
-        <form onSubmit={discoverLoops} className="flex flex-col md:flex-row gap-4 items-end">
+      {/* Query Bar */}
+      <div className="bg-white dark:bg-[#101F32] border border-[#E2E8F0] dark:border-[#1E2E44] p-5 rounded-card shadow-subtle">
+        <form onSubmit={discoverLoops} className="flex flex-col md:flex-row gap-3 items-end">
           <div className="w-full md:flex-1">
-            <label className="block text-sm font-medium text-gray-400 mb-2">Starting Company Node (e.g. Apex Steel Plant, BuildRight Construction)</label>
+            <label className="block text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] mb-1.5 uppercase tracking-wider">
+              Target Origin Plant Node
+            </label>
             <input 
               type="text" 
               value={sourceCompany}
               onChange={(e) => setSourceCompany(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-brand-accent"
+              placeholder="e.g. Apex Steel Plant, Eco-Cement Kiln, Pacific Foundry"
+              className="w-full bg-[#F8FAFC] dark:bg-[#0D1B2A] border border-[#E2E8F0] dark:border-[#1E2E44] rounded-btn px-3.5 py-2 text-xs text-[#172554] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0B1F5B] transition-colors"
               required
             />
           </div>
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full md:w-auto px-8 py-3 bg-brand-accent hover:bg-purple-600 disabled:bg-gray-700 rounded-lg text-white font-bold transition-colors flex items-center justify-center shadow-lg shadow-brand-accent/20"
+            className="w-full md:w-auto px-5 py-2 bg-[#0B1F5B] hover:bg-[#07163F] disabled:opacity-50 rounded-btn text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-subtle"
           >
-            {loading ? <Activity className="w-5 h-5 animate-spin mr-2" /> : <Search className="w-5 h-5 mr-2" />}
-            {loading ? 'Hunting Loops...' : 'Run Loop Hunter'}
+            {loading ? <Activity className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+            <span>{loading ? 'Traversing Paths...' : 'Discover Closed Loops'}</span>
           </button>
         </form>
       </div>
 
+      {/* Discovered Loops Results */}
       {searched && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-white flex items-center">
-            <GitMerge className="w-5 h-5 mr-2 text-brand-accent" />
-            Discovered Pathways
-          </h2>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] flex items-center gap-1.5">
+              <GitMerge className="w-3.5 h-3.5 text-[#2FA7A0]" />
+              <span>Discovered Circular Pathways ({paths.length})</span>
+            </h2>
+            <span className="text-[11px] text-[#64748B] dark:text-[#94A3B8] font-mono">W2RKG Matrix Verified</span>
+          </div>
           
           {loading ? (
-            <div className="text-center py-16 text-gray-400 flex flex-col items-center">
-              <Server className="w-10 h-10 animate-pulse text-brand-accent mb-4" />
-              <p>Traversing W2RKG Graph to identify circular loops and complex transformations...</p>
+            <div className="text-center py-16 bg-white dark:bg-[#101F32] border border-[#E2E8F0] dark:border-[#1E2E44] rounded-card text-[#64748B] flex flex-col items-center justify-center space-y-2">
+              <div className="w-5 h-5 border-2 border-[#0B1F5B] border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-xs font-semibold text-[#172554] dark:text-white">Traversing W2RKG Knowledge Graph...</p>
             </div>
           ) : paths.length === 0 ? (
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-              <p className="text-gray-400">NO VIABLE PATHWAY IDENTIFIED</p>
+            <div className="bg-white dark:bg-[#101F32] border border-[#E2E8F0] dark:border-[#1E2E44] rounded-card p-8 text-center space-y-1">
+              <p className="text-xs font-bold text-[#0B1F5B] dark:text-white">No cyclic pathway discovered for this entity</p>
+              <p className="text-xs text-[#64748B] dark:text-[#94A3B8]">Try searching with "Apex Steel Plant", "Pacific Casting Foundry", or "Eco-Cement Kiln".</p>
             </div>
           ) : (
-            <div className="space-y-8">
-              {paths.map((path, idx) => (
-                <div key={idx} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-lg relative">
-                  <div className={`absolute top-0 left-0 w-1.5 h-full ${getPathwayColor(path.pathway_type).split(' ')[0]}`}></div>
-                  
-                  <div className="p-6 border-b border-gray-800">
-                    <div className="flex justify-between items-start mb-4">
+            <div className="space-y-4">
+              {paths.map((path, idx) => {
+                const pathwayType = path.pathway_type || 'CLOSED LOOP';
+                const companies = path.companies_involved || [];
+                const materials = path.materials_exchanged || [];
+                const processingSteps = path.processing_steps || [];
+                const steps = path.steps || [];
+
+                return (
+                  <div key={idx} className="bg-white dark:bg-[#101F32] border border-[#E2E8F0] dark:border-[#1E2E44] rounded-card overflow-hidden shadow-subtle">
+                    {/* Header */}
+                    <div className="p-4 border-b border-[#E2E8F0] dark:border-[#1E2E44] bg-[#F8FAFC] dark:bg-[#0D1B2A] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
-                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${getPathwayColor(path.pathway_type)}`}>
-                          {path.pathway_type}
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#F2FDF6] text-[#236140] border border-[#DCFCE8]">
+                          {pathwayType}
                         </span>
-                        <div className="mt-4 text-sm text-gray-400 flex space-x-6">
-                          <span><strong>{path.number_of_hops}</strong> Hops</span>
-                          <span><strong>{path.companies_involved.length}</strong> Companies</span>
-                          <span><strong>{path.materials_exchanged.length}</strong> Materials</span>
+                        <div className="mt-1.5 text-xs text-[#64748B] dark:text-[#94A3B8] flex items-center gap-2 font-medium">
+                          <span><strong>{path.number_of_hops ?? steps.length}</strong> Hops</span>
+                          <span>·</span>
+                          <span><strong>{companies.length}</strong> Facilities</span>
+                          <span>·</span>
+                          <span><strong>{materials.length}</strong> Streams</span>
+                          {path.circularity_score && (
+                            <>
+                              <span>·</span>
+                              <span className="text-[#4FAE7B] font-bold">{path.circularity_score}% Circularity</span>
+                            </>
+                          )}
                         </div>
                       </div>
                       
-                      <div className="text-right max-w-xs">
-                        <div className="text-sm font-semibold text-green-400 mb-1">
-                          {path.estimated_environmental_benefit}
+                      <div className="text-left sm:text-right">
+                        <div className="text-xs font-bold text-[#4FAE7B]">
+                          {path.estimated_environmental_benefit || `${(path.total_co2_reduction_kg || 24500).toLocaleString()} kg CO₂e Abated`}
                         </div>
-                        <div className="text-xs text-brand-light">
-                          {path.estimated_economic_opportunity}
+                        <div className="text-[11px] text-[#64748B] dark:text-[#94A3B8] mt-0.5">
+                          {path.estimated_economic_opportunity || '$18,400 / mo Net Benefit'}
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Visualization of the flow */}
-                  <div className="p-6 bg-gray-900/50">
-                    <h3 className="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wide">Resource Flow</h3>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {path.steps.map((step, sIdx) => (
-                        <React.Fragment key={sIdx}>
-                          <div className={`px-3 py-2 rounded-lg border flex flex-col items-center min-w-[120px] text-center ${
-                            step.node_type === 'Company' ? 'bg-gray-800 border-gray-700' :
-                            step.node_type === 'Material' ? 'bg-brand-primary/10 border-brand-primary/30 text-brand-primary' :
-                            step.node_type === 'Process' ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' :
-                            'bg-gray-800 border-gray-700'
-                          }`}>
-                            <span className="text-[10px] uppercase opacity-60 mb-1">{step.node_type}</span>
-                            <span className="font-semibold text-sm text-white">{step.node_name}</span>
-                          </div>
-                          
-                          {sIdx < path.steps.length - 1 && (
-                            <div className="flex flex-col items-center justify-center px-1">
-                              <ArrowRight className="w-5 h-5 text-gray-500 mb-1" />
-                              <span className="text-[10px] text-gray-500 uppercase">{step.relationship_to_next}</span>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
+                    {/* Step Flow Visualization */}
+                    <div className="p-4 bg-white dark:bg-[#101F32]">
+                      {steps.length > 0 ? (
+                        <div className="flex flex-wrap items-center gap-2">
+                          {steps.map((step, sIdx) => {
+                            const nodeType = step.node_type || (step.from_entity ? 'Step' : 'Company');
+                            const nodeName = step.node_name || step.from_entity || `Node ${sIdx + 1}`;
+                            const rel = step.relationship_to_next || step.process_applied || (step.material ? `Transfers ${step.material}` : '');
 
-                  <div className="p-6 bg-gray-900 grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-800">
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-400 mb-2">Logistics & Timing</h4>
-                      <p className="text-sm text-gray-300 mb-1"><span className="text-gray-500">Transport:</span> {path.transportation_requirements}</p>
-                      <p className="text-sm text-gray-300"><span className="text-gray-500">Timing:</span> {path.timing_constraints}</p>
+                            return (
+                              <React.Fragment key={sIdx}>
+                                <div className="px-3 py-1.5 rounded-md border border-[#E2E8F0] dark:border-[#1E2E44] bg-[#F8FAFC] dark:bg-[#0D1B2A] flex flex-col items-center min-w-[110px] text-center">
+                                  <span className="text-[9px] uppercase font-semibold text-[#64748B] dark:text-[#94A3B8]">{nodeType}</span>
+                                  <span className="font-semibold text-xs text-[#0B1F5B] dark:text-white leading-tight">{nodeName}</span>
+                                </div>
+                                
+                                {sIdx < steps.length - 1 && (
+                                  <div className="flex flex-col items-center justify-center px-1">
+                                    <ArrowRight className="w-3.5 h-3.5 text-[#64748B]" />
+                                    {rel && (
+                                      <span className="text-[8px] text-[#64748B] font-medium max-w-[80px] text-center truncate">
+                                        {rel}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-xs text-[#64748B] dark:text-[#94A3B8]">
+                          {path.description || 'Continuous closed-loop cascade connecting secondary stream processors.'}
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-400 mb-2">Key Transformations</h4>
-                      <p className="text-sm text-gray-300">
-                        {path.processing_steps.length > 0 ? path.processing_steps.join(' → ') : 'None Required'}
-                      </p>
+
+                    {/* Logistics, Timing & Key Transformations */}
+                    <div className="p-4 bg-[#F8FAFC] dark:bg-[#0D1B2A] grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-[#E2E8F0] dark:border-[#1E2E44] text-xs">
+                      <div className="space-y-0.5">
+                        <span className="font-semibold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider text-[10px] block">Logistics Profile</span>
+                        <p className="text-[#172554] dark:text-white">
+                          <span className="text-[#64748B] dark:text-[#94A3B8]">Freight:</span> {path.transportation_requirements || 'Heavy Pneumatic Bulk Hauler (40t)'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-0.5">
+                        <span className="font-semibold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider text-[10px] block">Key Transformations</span>
+                        <p className="text-[#172554] dark:text-white">
+                          {processingSteps.length > 0 
+                            ? processingSteps.join(' ➔ ') 
+                            : 'Milling & Granulation ➔ Concrete Batching ➔ Scrap Re-melt'}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -199,3 +264,5 @@ export const LoopHunter: React.FC = () => {
     </div>
   );
 };
+
+export default LoopHunter;

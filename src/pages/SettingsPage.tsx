@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Settings, Building, MessageSquare, Bot, MapPin, ShieldCheck, 
-  Save, RefreshCw, CheckCircle2, AlertTriangle, Sliders, Smartphone, Download, Upload
+  Save, RefreshCw, CheckCircle2, AlertTriangle, Sliders, Smartphone, Download, Upload, Palette, Check
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface SymbioSettings {
   organization: {
@@ -48,8 +49,9 @@ export const SettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<SymbioSettings | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'org' | 'twilio' | 'ai' | 'gis' | 'compliance'>('org');
+  const [activeTab, setActiveTab] = useState<'org' | 'theme' | 'twilio' | 'ai' | 'gis' | 'compliance'>('theme');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const { currentTheme, setTheme, toggleTheme } = useTheme();
 
   useEffect(() => {
     fetchSettings();
@@ -154,8 +156,9 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Settings Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-800 pb-4">
+      <div className="flex flex-wrap gap-2 border-b border-brand-border pb-4">
         {[
+          { id: 'theme', name: 'Theme & Appearance', icon: Palette },
           { id: 'org', name: 'Organization & Plant', icon: Building },
           { id: 'twilio', name: 'Twilio Telematics & SMS', icon: MessageSquare },
           { id: 'ai', name: 'Gemini AI Advisor', icon: Bot },
@@ -167,8 +170,8 @@ export const SettingsPage: React.FC = () => {
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-brand-primary text-white shadow-lg'
-                : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
+                ? 'bg-brand-primary text-white shadow-glow'
+                : 'bg-brand-surface text-brand-muted hover:text-brand-light border border-brand-border'
             }`}
           >
             <tab.icon className="w-4 h-4" /> {tab.name}
@@ -177,7 +180,72 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Settings Content Panels */}
-      <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6">
+      <div className="bg-brand-surface border border-brand-border rounded-3xl p-6 shadow-card">
+        {/* TAB: Theme & Palette Customizer */}
+        {activeTab === 'theme' && (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-bold text-[#0B1F5B] dark:text-white flex items-center gap-2">
+                <Palette className="w-4 h-4 text-[#2FA7A0]" /> Visual System & Appearance
+              </h3>
+              <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1">
+                Toggle between Enterprise ESG Light (audited daylight theme) and Operations Dark Mode.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                onClick={() => setTheme('light')}
+                className={`p-4 rounded-card border cursor-pointer transition-colors ${
+                  currentTheme === 'light'
+                    ? 'bg-[#EFF6FF] border-[#2563EB] shadow-subtle'
+                    : 'bg-[#F8FAFC] dark:bg-[#0D1B2A] border-[#E2E8F0] dark:border-[#1E2E44]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold text-xs text-[#0F172A]">Enterprise White & Blue (Default)</span>
+                  {currentTheme === 'light' && (
+                    <span className="px-2 py-0.2 rounded text-[10px] font-semibold bg-[#2563EB] text-white flex items-center gap-1">
+                      <Check className="w-3 h-3" /> ACTIVE
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-[#475569] mb-3">Clean high-contrast white layout with royal blue accents and bold typography.</p>
+                <div className="flex items-center gap-1.5 pt-2 border-t border-[#E2E8F0]">
+                  <span className="w-4 h-4 rounded bg-[#FFFFFF] border border-[#CBD5E1]" title="Pure White #FFFFFF"></span>
+                  <span className="w-4 h-4 rounded bg-[#2563EB]" title="Royal Blue #2563EB"></span>
+                  <span className="w-4 h-4 rounded bg-[#0F172A]" title="Deep Black #0F172A"></span>
+                  <span className="w-4 h-4 rounded bg-[#F8FAFC] border border-[#CBD5E1]" title="Surface #F8FAFC"></span>
+                </div>
+              </div>
+
+              <div
+                onClick={() => setTheme('dark')}
+                className={`p-4 rounded-card border cursor-pointer transition-colors ${
+                  currentTheme === 'dark'
+                    ? 'bg-[#0B1120] border-[#3B82F6] shadow-subtle'
+                    : 'bg-[#F8FAFC] dark:bg-[#0D1B2A] border-[#E2E8F0] dark:border-[#1E2E44]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold text-xs text-[#0F172A] dark:text-white">Obsidian Black & Blue (Dark)</span>
+                  {currentTheme === 'dark' && (
+                    <span className="px-2 py-0.2 rounded text-[10px] font-semibold bg-[#3B82F6] text-white flex items-center gap-1">
+                      <Check className="w-3 h-3" /> ACTIVE
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mb-3">Pure black night interface with vibrant blue telematics and white data readouts.</p>
+                <div className="flex items-center gap-1.5 pt-2 border-t border-[#E2E8F0] dark:border-[#1E2E44]">
+                  <span className="w-4 h-4 rounded bg-[#050811] border border-white/20" title="True Black #050811"></span>
+                  <span className="w-4 h-4 rounded bg-[#0B1120]" title="Card #0B1120"></span>
+                  <span className="w-4 h-4 rounded bg-[#3B82F6]" title="Vibrant Blue #3B82F6"></span>
+                  <span className="w-4 h-4 rounded bg-[#FFFFFF]" title="White #FFFFFF"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* TAB 1: Organization & Facility Profile */}
         {activeTab === 'org' && (
           <div className="space-y-6">
