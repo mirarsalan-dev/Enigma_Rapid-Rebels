@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "tsc -b && vite build",
+    "prestart": "npm run build",
     "lint": "oxlint",
     "start": "tsx server.ts",
     "preview": "vite preview"

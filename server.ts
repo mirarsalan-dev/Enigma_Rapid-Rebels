@@ -2699,6 +2699,9 @@ app.post('/api/settings', (req: Request, res: Response) => {
 // Vite Integration (Dev) or Static Serving (Prod)
 async function startServer() {
   const isDev = process.env.NODE_ENV !== 'production';
+  const distPath = path.resolve(__dirname, 'dist');
+  const indexHtmlPath = path.join(distPath, 'index.html');
+  const distExists = fs.existsSync(indexHtmlPath);
 
   if (isDev) {
     const { createServer: createViteServer } = await import('vite');
@@ -2707,12 +2710,26 @@ async function startServer() {
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
-    const distPath = path.resolve(__dirname, 'dist');
+  } else if (distExists) {
     app.use(express.static(distPath));
     app.use((_req: Request, res: Response) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      res.sendFile(indexHtmlPath);
     });
+  } else {
+    console.warn('⚠️ Warning: dist/index.html was not found. Launching on-demand Vite compiler fallback.');
+    try {
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true, hmr: false },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } catch (err) {
+      console.error('Failed to start fallback Vite middleware:', err);
+      app.use((_req: Request, res: Response) => {
+        res.status(500).send('Production build not found. Please ensure "npm run build" is run during deployment.');
+      });
+    }
   }
 
   app.listen(PORT, HOST, () => {
